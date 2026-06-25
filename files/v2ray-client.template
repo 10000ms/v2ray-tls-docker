@@ -22,8 +22,7 @@
   ],
   "outbounds": [
     {
-      "sendThrough": "0.0.0.0",
-      "protocol": "vmess",
+      "protocol": "vless",
       "settings": {
         "vnext": [
           {
@@ -31,30 +30,29 @@
             "port": 443,
             "users": [
               {
-                "alterId": 32,
-                "security": "aes-128-gcm",
-                "id": "{UUID}"
+                "id": "{UUID}",
+                "encryption": "none"
               }
             ]
           }
         ]
       },
-      "tag": "vmess_main",
+      "tag": "vless_main",
       "streamSettings": {
         "network": "ws",
         "security": "tls",
-        "wsSettings": {
-          "path": "/{PATH}"
+        "tlsSettings": {
+          "serverName": "{URI}"
         },
-        "sockopt": {
-          "mark": 0,
-          "tcpFastOpen": true,
-          "tproxy": "off"
+        "wsSettings": {
+          "path": "/{PATH}",
+          "headers": {
+            "Host": "{URI}"
+          }
         }
       },
       "mux": {
-        "enabled": false,
-        "concurrency": 8
+        "enabled": false
       }
     }
   ]

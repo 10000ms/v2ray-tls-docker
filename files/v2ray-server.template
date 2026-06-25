@@ -41,15 +41,14 @@
     {
       "port": {PORT},
       "listen": "0.0.0.0",
-      "protocol": "vmess",
+      "protocol": "vless",
       "settings": {
         "clients": [
           {
-            "id": "{UUID}",
-            "alterId": 32
+            "id": "{UUID}"
           }
         ],
-        "disableInsecureEncryption": true
+        "decryption": "none"
       },
       "streamSettings": {
         "network": "ws",
@@ -64,7 +63,7 @@
           "tls"
         ]
       },
-      "tag": "vmes_main"
+      "tag": "vless_main"
     }
   ],
   "outbounds": [

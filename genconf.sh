@@ -9,7 +9,8 @@ usage="$(basename "$0") [-h] [-m -d -p]\n\n
       -h help\n\n
       -m your email address eg: user@admin.com\n\n
       -d your dns eg: www.example.com\n\n
-      -p (optional) caddy plugins eg: http-cache,tls.dns.cloudflare\n"
+      -p (optional) extra Caddy v2 modules, comma-separated Go module paths\n
+         eg: github.com/caddy-dns/cloudflare\n"
 
 colorEcho(){
   COLOR=$1
@@ -52,23 +53,18 @@ if [[ -z $V2RAY_DOMAIN ]]; then
 fi
 
 let PORT=$RANDOM+10000
-PATH=$(/bin/cat /proc/sys/kernel/random/uuid)
-UUID=$(/bin/cat /proc/sys/kernel/random/uuid)
+# NOTE: do NOT name these PATH — that overrides the shell's $PATH.
+WS_PATH=$(cat /proc/sys/kernel/random/uuid)
+UUID=$(cat /proc/sys/kernel/random/uuid)
 
-if [[ ! -d "config" ]]; then
-  /bin/mkdir "config"
-fi
+mkdir -p config
 
-/bin/sed "s/{PORT}/$PORT/; s/{UUID}/$UUID/; s/{PATH}/$PATH/" files/v2ray-server.template > config/config.json
-/bin/sed "s/{URI}/$V2RAY_DOMAIN/; s/{PATH}/$PATH/; s/{UUID}/$UUID/" files/v2ray-client.template > config/client.json
-/bin/sed "s/{URI}/$V2RAY_DOMAIN/; s/{EMAIL}/$EMAIL/; s/{PATH}/$PATH/; s/{PORT}/$PORT/" files/caddyfile.template > config/Caddyfile
-/bin/cp config/config.json build/v2ray-tls/
-/bin/cp config/Caddyfile build/web-server/
+sed "s/{PORT}/$PORT/; s/{UUID}/$UUID/; s/{PATH}/$WS_PATH/" files/v2ray-server.template > config/config.json
+sed "s/{URI}/$V2RAY_DOMAIN/; s/{PATH}/$WS_PATH/; s/{UUID}/$UUID/" files/v2ray-client.template > config/client.json
+sed "s/{URI}/$V2RAY_DOMAIN/; s/{EMAIL}/$EMAIL/; s/{PATH}/$WS_PATH/; s/{PORT}/$PORT/" files/caddyfile.template > config/Caddyfile
 
-if [[ -z $PLUGINS ]]; then
-  /bin/sed "s/{PLUGINS}//" files/getcaddy.template > build/web-server/getcaddy.sh
-else
-  /bin/sed "s/{PLUGINS}/plugins=$PLUGINS/" files/getcaddy.template > build/web-server/getcaddy.sh
-fi
+# Extra Caddy modules for the (optional) custom build. docker-compose.build.yaml
+# reads CADDY_MODULES from this .env file as a build arg.
+echo "CADDY_MODULES=${PLUGINS}" > .env
 
 colorEcho ${GREEN} "Please use $(pwd)/config/client.json to configure your client."
