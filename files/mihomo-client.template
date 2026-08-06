@@ -1,0 +1,19 @@
+# mihomo (Clash.Meta) proxy entry for this server.
+# Merge the item below into the `proxies:` list of your own mihomo config,
+# then reference the proxy by name from your `proxy-groups:`.
+proxies:
+  - name: "{URI}"
+    type: vless
+    server: {URI}
+    port: 443
+    uuid: {UUID}
+    # VLESS carries no encryption of its own — TLS is what protects the traffic.
+    tls: true
+    servername: {URI}
+    udp: true
+    network: ws
+    client-fingerprint: chrome
+    ws-opts:
+      path: "/{PATH}"
+      headers:
+        Host: {URI}
