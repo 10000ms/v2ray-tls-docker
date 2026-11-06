@@ -1,5 +1,16 @@
 {URI} {
-	tls {EMAIL}
+	# Let's Encrypt's Gen Y intermediates (YE*/YR*) chain to Root YE / Root YR,
+	# which no major trust store includes yet. Pin the chain that is
+	# cross-signed up to ISRG Root X1, or clients fail with
+	# "x509: certificate signed by unknown authority".
+	tls {
+		issuer acme {
+			email {EMAIL}
+			preferred_chains {
+				root_common_name "ISRG Root X1"
+			}
+		}
+	}
 
 	# WebSocket path -> V2Ray (TLS is terminated here, plain ws to upstream).
 	# Caddy v2 reverse_proxy auto-detects and forwards WebSocket upgrades.
